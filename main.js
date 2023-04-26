@@ -2,6 +2,8 @@ const margin = { top: 0, right: 0, bottom: 0, left: 0 };
 const width = 1000 - margin.left - margin.right;
 const height = 1000 - margin.top - margin.bottom;
 
+//  The Map is 1000 x 1000 px, so margins throw off the data.
+//  You could accomodate and skew but it feels unnecessary.
 const svg = d3
   .select('#map')
   .append('svg')
@@ -10,6 +12,7 @@ const svg = d3
   .attr('transform', `translate(${margin.left},${margin.top})`);
 
 
+// These are the x and y pixel coordinates of each gate in a look-up table
 const gates = [
 { name: 'camping0', x: 265, y: 209},       
 { name: 'camping1', x: 645,  y: 255},       
@@ -54,21 +57,29 @@ const gates = [
 ];
 
 
-const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
-
 /** 
-// Select the dropdown menu
+
+// DROP DOWN MENU - Some Suggestions
+
+// Select the dropdown menu?
 const dropdown = d3.select("#car-dropdown");
 
-// Add an event listener to the dropdown menu
+// Add an event listener to the dropdown menu?
 dropdown.on("change", function() {
   // Get the selected car id
   const selectedCarId = d3.select(this).property("value");
   
-  // Call the plotCarPath method with the selected car id
+  // Create/Call the plotCarPath method with the selected car id?
   plotCarPath(selectedCarID);
 });
+
+
 */
+
+
+//  DATA EXTRAPOLATION - our data has string data that needs to become
+//  coordinates, so getX() and getY() will take in the gate string and 
+//  compare with the gates look-up table above
 
 // Takes in a gate, returns X coordinate
 function getX(gateName){
@@ -82,13 +93,18 @@ function getY(gateName){
   return gate ? Number(gate.y) : null;
 }
 
-// loads CSV, Picks out specific ID (Replace with variable to select multiple!)
+// loads CSV, Picks out specific ID (Replace with variable to enable to ability to switch!)
 d3.csv('data.csv').then((d) => {
   return d;
 }).then((data) => {
   const selectedCarData = data.filter(d => d.id === "20155705025759-63");
-  console.log(selectedCarData);
   
+
+  //  xScale and yScale are NORMALLY necesary, however since we were able to 
+  //  essentially create the exact pixel location for each gate, they will 
+  //  only ruin the data.. for now they do not get used, however they are here
+  //  in case you need them!
+
   const xScale = d3.scaleLinear()
     .domain([0, 1000])
     .range([0, width]);
@@ -97,12 +113,15 @@ d3.csv('data.csv').then((d) => {
     .domain([0, 1000])
     .range([height, 0]);
 
+  //  This adds the image to the svg and sizes it approprately
   svg.append('image')
     .attr('xlink:href', 'Lekagul_Map_Upscale.png')
     .attr('width', width)
     .attr('height', height);
 
-  console.log(getX(selectedCarData[0].gate));
+  //  This is where the magic happens, our pruned data will now utilizes
+  //  the getX and getY functions to get the coordinates needed to map 
+  //  the circles.
   svg.selectAll('.selectedCarData')
     .data(selectedCarData)
     .join('circle')
@@ -112,15 +131,19 @@ d3.csv('data.csv').then((d) => {
     .attr('r', 5)
     .style('fill', 'red');
 
+  //  This line element will draw in between the circles, its important
+  //  that the coordinate conversion still occurs here!
   const lineGenerator = d3.line()
-    .x((d) => xScale(d.x))
-    .y((d) => yScale(d.y))
+    .x((d) => getX(d.gate))
+    .y((d) => getY(d.gate))
     .curve(d3.curveCatmullRom.alpha(0.5));
 
+  //  The final piece that connects all the lines together into a stroke.
+  //  There is some fancy curve work above that may need to be adjusted.
   svg.append('path')
     .datum(selectedCarData)
     .attr('d', lineGenerator)
-    .attr('stroke', colorScale())
+    .attr('stroke', 'red')
     .attr('stroke-width', 2)
     .attr('fill', 'none');
 });
