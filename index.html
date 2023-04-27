@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>My Map</title>
     <style>
+      body {
+        background-color: black;
+      }
+      #dropdown {
+        font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+        color: white;
+      }
       #map svg {
         width: 100%;
         height: 100%;
@@ -11,10 +18,17 @@
     </style>    
   </head>
   <body>
-    <label for ="car-dropdown">Choose a Car ID: </label>
+    <label for ="car-dropdown" id="dropdown">Choose a Car ID: </label>
     <select name="car-dropdown" id="car-dropdown">
-    <option value="20155705025759-63" selected>The Car that Never Left</option>
+    <option value="" selected > Select a Car</option>
+    <option value="20155705025759-63" >The Car that Never Left</option>
+    <option value="20154519024544-322" >Truck Tipping 281 Sensors</option>
+    <option value="20150104020118-228" >4+ Axle Trucks</option>
+    <option value="20165930065938-555" >Car Passing Through Route 1</option>
+    <option value="20165922125905-401" >Car Passing Through Route 2</option>
+    <option value="20151320031302-558" >Speeding Car</option>
     <!-- Add more options! -->
+    
   </select>
     <div id="map">
       <div id="map-container"></div>
@@ -23,4 +37,3 @@
     <script src="main.js"></script>
   </body>
 </html>
-

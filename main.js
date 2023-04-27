@@ -2,6 +2,14 @@ const margin = { top: 0, right: 0, bottom: 0, left: 0 };
 const width = 1000 - margin.left - margin.right;
 const height = 1000 - margin.top - margin.bottom;
 
+const selectElement = document.getElementById('car-dropdown');
+
+selectElement.addEventListener('change', (event) => {
+  const value = event.target.value;
+
+  plotMap(value);
+});
+
 //  The Map is 1000 x 1000 px, so margins throw off the data.
 //  You could accomodate and skew but it feels unnecessary.
 const svg = d3
@@ -57,26 +65,6 @@ const gates = [
 ];
 
 
-/** 
-
-// DROP DOWN MENU - Some Suggestions
-
-// Select the dropdown menu?
-const dropdown = d3.select("#car-dropdown");
-
-// Add an event listener to the dropdown menu?
-dropdown.on("change", function() {
-  // Get the selected car id
-  const selectedCarId = d3.select(this).property("value");
-  
-  // Create/Call the plotCarPath method with the selected car id?
-  plotCarPath(selectedCarID);
-});
-
-
-*/
-
-
 //  DATA EXTRAPOLATION - our data has string data that needs to become
 //  coordinates, so getX() and getY() will take in the gate string and 
 //  compare with the gates look-up table above
@@ -93,11 +81,12 @@ function getY(gateName){
   return gate ? Number(gate.y) : null;
 }
 
+function plotMap(value) {
 // loads CSV, Picks out specific ID (Replace with variable to enable to ability to switch!)
 d3.csv('data.csv').then((d) => {
   return d;
 }).then((data) => {
-  const selectedCarData = data.filter(d => d.id === "20155705025759-63");
+  const selectedCarData = data.filter(d => d.id === value);
   
 
   //  xScale and yScale are NORMALLY necesary, however since we were able to 
@@ -118,6 +107,8 @@ d3.csv('data.csv').then((d) => {
     .attr('xlink:href', 'Lekagul_Map_Upscale.png')
     .attr('width', width)
     .attr('height', height);
+
+
 
   //  This is where the magic happens, our pruned data will now utilizes
   //  the getX and getY functions to get the coordinates needed to map 
@@ -146,4 +137,5 @@ d3.csv('data.csv').then((d) => {
     .attr('stroke', 'red')
     .attr('stroke-width', 2)
     .attr('fill', 'none');
-});
+  });
+}
